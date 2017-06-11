@@ -48,7 +48,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(linum ((t (:background "#0c0d0e" :foreground "#44505c"))))
- '(mode-line-inactive ((t (:background "#171aic" :foreground "dim gray" :box nil)))))
+ '(mode-line-inactive ((t (:background "#232629" :foreground "dim gray" :box nil)))))
 
 
 
@@ -373,7 +373,8 @@
 	;; don't save message to Sent Messages, Gmail/IMAP takes care of this
 	mu4e-sent-messages-behavior 'delete
 	;; don't keep message buffers around
-	message-kill-buffer-on-exit t ))
+	message-kill-buffer-on-exit t
+	mu4e-maildir-shortcuts ()))
 
 
 ;; ============ ;;   golden-ratio   ;; ============ ;;
