@@ -147,6 +147,12 @@
 
 ;; HOOKS TERMINAR!!!!
 
+;; (mapc (lambda (mode-cmd) (add-hook (car mode-cmd) (cadr mode-cmd)))
+;;       '((c++-mode-hook linum-mode)
+;; 	(c++-mode-hook irony-mode)
+;; 	(c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++1y")))
+;; 	(c++-mode-hook company-mode)
+;; 	(c++-mode-hook flycheck-mode)))
 
 (defun my-irony-mode-hook ()
   (define-key irony-mode-map [remap completion-at-point]
@@ -179,7 +185,7 @@
 ;; ============= ;; flycheck-mode ;; =============
 (add-hook 'c++-mode-hook 'flycheck-mode) (add-hook 'c-mode-hook 'flycheck-mode) (eval-after-load 'flycheck '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 ;; ============= ;; eldoc-mode ;; =============
-;; (add-hook 'irony-mode-hook 'irony-eldoc)
+ (add-hook 'irony-mode-hook 'irony-eldoc)
 
 
 
