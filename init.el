@@ -47,7 +47,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(linum ((t (:background "#0c0d0e" :foreground "#44505c")))))
+ '(linum ((t (:background "#0c0d0e" :foreground "#44505c"))))
+ '(mode-line-inactive ((t (:background "#171aic" :foreground "dim gray" :box nil)))))
 
 
 
@@ -118,6 +119,7 @@
 (global-set-key (kbd "C-x o") 'other-window)
 (global-set-key (kbd "M--") 'menu-bar-mode)
 (global-set-key (kbd "M-p") 'gcm-scroll-up)
+(global-set-key (kbd "M-n") 'gcm-scroll-down)
 (global-set-key  [f9] 'gud-step)
 (global-set-key  [f6] 'gud-next)
 
