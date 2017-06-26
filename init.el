@@ -35,7 +35,7 @@
  '(org-mobile-inbox-for-pull "~/Dropbox/org/from-mobile.org")
  '(package-selected-packages
    (quote
-    (image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
+    (conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
  '(pdf-tools-enabled-modes
    (quote
     (pdf-history-minor-mode pdf-isearch-minor-mode pdf-links-minor-mode pdf-misc-minor-mode pdf-outline-minor-mode pdf-misc-size-indication-minor-mode pdf-misc-menu-bar-minor-mode pdf-annot-minor-mode pdf-sync-minor-mode pdf-misc-context-menu-minor-mode pdf-cache-prefetch-minor-mode pdf-occur-global-minor-mode pdf-virtual-global-minor-mode)))
@@ -48,7 +48,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(linum ((t (:background "#0c0d0e" :foreground "#44505c"))))
- '(mode-line-inactive ((t (:background "#232629" :foreground "dim gray" :box nil)))))
+ '(mode-line ((t (:background "#222226" :foreground "#b2b2b2" :box (:line-width 1 :color "gray43") :height 0.9))))
+ '(mode-line-inactive ((t (:background "#232629" :foreground "dim gray" :box nil))))
+ '(swiper-match-face-2 ((t (:background "tan" :inverse-video t)))))
 
 
 
@@ -73,6 +75,10 @@
   (mark-whole-buffer)
   (diredp-unmark-region-files))
 
+(defun exchange-mark-no-deac ()
+  (interactive)
+  (exchange-point-and-mark)
+  (deactivate-mark nil))
 (defun prog2 () (interactive)
        (let ((root (concat "~/Dropbox/puc/prog2/" "aula_"
                            (number-to-string (second (calendar-current-date)))
@@ -107,8 +113,8 @@
 
 
 ;; set keybinds
-
-(global-set-key (kbd "C-x C-f") 'ido-find-file)
+ 
+(global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-x k") 'kill-this-buffer)
 ;; (global-set-key (kbd "<f2>") 'common-lisp-hyperspec-lookup-reader-macro)
 ;; (global-set-key (kbd "<f3>") 'common-lisp-hyperspec-format)
@@ -116,13 +122,17 @@
 (global-set-key (kbd "C-l") 'backward-delete-char)
 (global-set-key (kbd "C-a") 'back-to-indentation)
 (global-set-key (kbd "M-;") 'comment-dwim)
-(global-set-key (kbd "C-x o") 'other-window)
+(global-set-key (kbd "M-o") 'other-window)
+(global-set-key (kbd "M-l") 'backward-kill-word)
+(global-set-key (kbd "C-x o") '(lambda ()(interactive) (insert "usar M-o")))
+(global-set-key (kbd "C-x s") 'save-buffer)
 (global-set-key (kbd "M--") 'menu-bar-mode)
 (global-set-key (kbd "M-p") 'gcm-scroll-up)
 (global-set-key (kbd "M-n") 'gcm-scroll-down)
 (global-set-key  [f9] 'gud-step)
 (global-set-key  [f6] 'gud-next)
-
+;;(global-set-key  (kbd "C-x C-x") 'exchange-mark-no-deac)
+(global-set-key  (kbd "C-x C-x") 'exchange-point-and-mark)
 (define-prefix-command 'f2-map)
 (global-set-key (kbd "<f2>") 'f2-map)
 (mapc (lambda (command-key)
@@ -142,8 +152,11 @@
       visible-bell nil
       global-auto-revert-mode t
       inhibit-startup-message t
-      fit-window-to-buffer-horizontally t)
-
+      fit-window-to-buffer-horizontally t
+      display-time-mode t)
+      
+;; (set-fringe-style '(500 . 500))
+;; (set-fringe-style '(10 . 10))
 
 
 
@@ -174,7 +187,7 @@
         emacs-lisp-mode-hook
         python-mode-hook
         conf-mode-hook))
-(add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++1y")))
+(add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++1z")))
 
 
 
@@ -187,8 +200,7 @@
 ;; ============= ;; flycheck-mode ;; =============
 (add-hook 'c++-mode-hook 'flycheck-mode) (add-hook 'c-mode-hook 'flycheck-mode) (eval-after-load 'flycheck '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 ;; ============= ;; eldoc-mode ;; =============
- (add-hook 'irony-mode-hook 'irony-eldoc)
-
+;; (add-hook 'irony-mode-hook 'irony-eldoc) 
 
 
 
@@ -201,10 +213,13 @@
 ;; ============ ;;   slime   ;; ============ ;;
 
 (use-package slime
-  :bind (:map slime-mode-map
+  :bind (
+	 :map slime-mode-map
 	      ("<f1>" . slime-documentation-lookup)
+	      ("M-m" . slime-selector)
 	      :map slime-repl-mode-map
-	      ("<f1>" . slime-documentation-lookup))
+	      ("<f1>" . slime-documentation-lookup)
+	      ("M-m" . slime-selector))
   :init
   (load (expand-file-name "~/.roswell/helper.el"))
   (setq slime-contribs '(slime-fancy)
@@ -217,6 +232,8 @@
 (use-package swiper
   :bind (("C-s" . swiper)
 	 :map swiper-map
+	 ("C-s" . ivy-next-line)
+	 ("C-r" . ivy-previous-line)
 	 ("C-l" . backward-delete-char)))
 
 
@@ -236,7 +253,6 @@
 (use-package which-key
   :config
   (which-key-mode 1))
-
 
 
 ;; ============ ;;   company   ;; ============ ;;
@@ -286,7 +302,8 @@
 
 
 (use-package org
-  :bind (("C-c a" . org-agenda))
+  :bind (("C-c c" . org-capture)
+	 ("C-c a" . org-agenda))
   :init
   (setq org-todo-keywords '((sequence "TODO" "MOSTLY DONE" "DONE"))
 	org-agenda-files (list "~/Dropbox/todo.org" "~/Dropbox/todos/Faculdade.org" "~/Dropbox/todos/projs.org" "~/Dropbox/todos/misc.org")
@@ -304,7 +321,7 @@
 	 ("M-x" . helm-M-x)
 	 ("M-h" . helm-apropos)
 	 :map helm-map
-	 ("<tab>" . helm-execute-persistent-action) ; rebind tab to do persistent action
+ 	 ("<tab>" . helm-execute-persistent-action) ; rebind tab to do persistent action
 	 ("C-i" . helm-execute-persistent-action) ; make TAB works in terminal
 	 ("C-z" . helm-select-action) ; list actions using C-z
 	 ("C-l" . backward-delete-char))
@@ -332,11 +349,12 @@
 
 
 (use-package w3m
-  :bind (:map w3m-mode-map
-	      ("M-n" . gcm-scroll-down)
-	      ("n" . gcm-scroll-down)
-	      ("M-p" . gcm-scroll-up)
-	      ("p" . gcm-scroll-up))
+  :bind (("C-h g" . w3m-goto-url)
+	 :map w3m-mode-map
+	 ("M-n" . gcm-scroll-down)
+	 ("n" . gcm-scroll-down)
+	 ("M-p" . gcm-scroll-up)
+	 ("p" . gcm-scroll-up))
   :init
   (setq w3m-user-agent "Mozilla/5.0 (Linux; U; Android 2.3.3; zh-tw; HTC_Pyramid Build/GRI40) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.")
   (setq browse-url-browser-function 'w3m-goto-url-new-session)
