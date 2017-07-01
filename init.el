@@ -52,7 +52,7 @@
  '(mode-line-inactive ((t (:background "#232629" :foreground "dim gray" :box nil))))
  '(swiper-match-face-2 ((t (:background "tan" :inverse-video t)))))
 
-
+n
 
 ;; set functions
 
@@ -64,6 +64,8 @@
        (find-file "~/.config/i3/config"))
 (defun i3-blocks-config () (interactive)
        (find-file "~/.config/i3/.i3blocks.conf"))
+(defun conkeror-config () (interactive)
+       (find-file "~/.conkerorrc"))
 (defun home-folder () (interactive)
        (dired "~/"))
 
@@ -133,6 +135,7 @@
 (global-set-key  [f6] 'gud-next)
 ;;(global-set-key  (kbd "C-x C-x") 'exchange-mark-no-deac)
 (global-set-key  (kbd "C-x C-x") 'exchange-point-and-mark)
+(global-set-key (kbd "M-r") 'anzu-replace-modificado)
 (define-prefix-command 'f2-map)
 (global-set-key (kbd "<f2>") 'f2-map)
 (mapc (lambda (command-key)
@@ -142,7 +145,8 @@
 	(mu4e "m")
 	(home-folder "h")
 	(i3-main-config "i c")
-	(i3-blocks-config "i b")))
+	(i3-blocks-config "i b")
+	(conkeror-config "c")))
 
 ;; set startup
 
@@ -213,13 +217,14 @@
 ;; ============ ;;   slime   ;; ============ ;;
 
 (use-package slime
+  :ensure t
   :bind (
 	 :map slime-mode-map
-	      ("<f1>" . slime-documentation-lookup)
-	      ("M-m" . slime-selector)
-	      :map slime-repl-mode-map
-	      ("<f1>" . slime-documentation-lookup)
-	      ("M-m" . slime-selector))
+	 ("<f1>" . slime-documentation-lookup)
+	 ("M-m" . slime-selector)
+	 :map slime-repl-mode-map
+	 ("<f1>" . slime-documentation-lookup)
+	 ("M-m" . slime-selector))
   :init
   (load (expand-file-name "~/.roswell/helper.el"))
   (setq slime-contribs '(slime-fancy)
@@ -230,6 +235,7 @@
 ;; ============ ;;   swiper   ;; ============ ;;
 
 (use-package swiper
+  :ensure t
   :bind (("C-s" . swiper)
 	 :map swiper-map
 	 ("C-s" . ivy-next-line)
@@ -240,6 +246,7 @@
 ;; ============ ;;   flycheck   ;; ============ ;;
 
 (use-package flycheck
+  :ensure t
   :init
   (add-hook 'after-init-hook #'global-flycheck-mode)
   :config
@@ -251,6 +258,7 @@
 ;; ============ ;;   which-key   ;; ============ ;;
 
 (use-package which-key
+  :ensure t
   :config
   (which-key-mode 1))
 
@@ -259,6 +267,7 @@
 
 
 (use-package company
+  :ensure t
   :bind (:map company-active-map
 	      ("spc" . company-abort)
 	      ("\C-n" . company-select-next-or-abort)
@@ -280,13 +289,16 @@
 ;; ============ ;;   image-dired   ;; ============ ;;
 
 (use-package image-dired)
+:ensure t
 
 ;; ============ ;;   image-dired+   ;; ============ ;;
 
 (use-package image-dired+)
+:ensure t
 ;; ============ ;;   dired+   ;; ============ ;;
 
 (use-package dired+
+  :ensure t
   :bind (:map diredp-list-files-map
 	      ("M-n" . gcm-scroll-down)
 	      ("M-p" . gcm-scroll-up)
@@ -295,6 +307,8 @@
   ;; 	  (interactive)
   ;; 	  (setq current-prefix-arg '(5))
   ;; 	  (call-interactively 'image-dired-dired-toggle-marked-thumbs)))
+  :config
+  (diredp-all-files)
   )
 
 
@@ -302,6 +316,7 @@
 
 
 (use-package org
+  :ensure t
   :bind (("C-c c" . org-capture)
 	 ("C-c a" . org-agenda))
   :init
@@ -314,6 +329,7 @@
 
 
 (use-package helm
+  :ensure t
   :bind (("C-x b" . helm-buffers-list)
 	 ("C-x C-f" . helm-find-files)
 	 ("C-x f" .  helm-locate)
@@ -349,6 +365,7 @@
 
 
 (use-package w3m
+  :ensure t
   :bind (("C-h g" . w3m-goto-url)
 	 :map w3m-mode-map
 	 ("M-n" . gcm-scroll-down)
@@ -366,6 +383,7 @@
 
 
 (use-package smtpmail
+  :ensure t
   :init
   (setq message-send-mail-function 'smtpmail-send-it
 	smtpmail-stream-type 'starttls
@@ -377,6 +395,7 @@
 ;; ============ ;;   mu4e   ;; ============ ;;
 
 (use-package mu4e
+  :ensure t
   :init 
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
   (setq org-mu4e-link-query-in-headers-mode nil
@@ -398,6 +417,7 @@
 ;; ============ ;;   golden-ratio   ;; ============ ;;
 
 (use-package golden-ratio
+  :ensure t
   :init
   (defun pl/helm-alive-p ()
     (if (boundp 'helm-alive-p)
@@ -407,7 +427,21 @@
   (golden-ratio-mode t))
 
 
+;; ============ ;;   anzu   ;; ============ ;;
 
+(use-package anzu
+  :ensure t
+  :config
+  (defun anzu-replace-modificado ()
+  "anzu-query-replace-at-cursor-thing without query."
+  (interactive)
+  (let ((orig (point-marker)))
+    (anzu--query-replace-common t
+                                :at-cursor t
+                                :query nil)
+    (goto-char (marker-position orig))
+    (set-marker orig nil)))
+)
 ;; ============ ;;   theme   ;; ============ ;;
 
 (load-theme 'spacemacs-dark)
