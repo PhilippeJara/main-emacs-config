@@ -16,6 +16,9 @@
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector
    ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
+ '(company-echo-truncate-lines nil)
+ '(company-tooltip-idle-delay 0.5)
+ '(company-tooltip-margin 2)
  '(cua-mode t nil (cua-base))
  '(cua-normal-cursor-color "black")
  '(custom-enabled-themes nil)
@@ -25,17 +28,19 @@
  '(ede-project-directories
    (quote
     ("/home/philippe/teste" "/home/philippe/Dropbox/Prog/lisp/org-parser" "c:/Users/Philippe/Dropbox/puc/prog2")))
+ '(el-get-dir "~/.emacs.d/elpa/el-get-5.1/")
  '(electric-pair-mode t)
  '(global-hl-line-mode t)
  '(global-prettify-symbols-mode t)
  '(ido-mode t nil (ido))
  '(menu-bar-mode nil)
+ '(modern-c++-font-lock-global-mode t)
  '(org-mobile-directory "~/Dropbox/org_mobile")
  '(org-mobile-files (quote (org-agenda-files "~/Dropbox/todos/")))
  '(org-mobile-inbox-for-pull "~/Dropbox/org/from-mobile.org")
  '(package-selected-packages
    (quote
-    (conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
+    (helm-directory el-get swiper-helm rainbow-delimiters cpputils-cmake cmake-project htmlize modern-cpp-font-lock cmake-mode cmake-ide json-mode centered-window-mode conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
  '(pdf-tools-enabled-modes
    (quote
     (pdf-history-minor-mode pdf-isearch-minor-mode pdf-links-minor-mode pdf-misc-minor-mode pdf-outline-minor-mode pdf-misc-size-indication-minor-mode pdf-misc-menu-bar-minor-mode pdf-annot-minor-mode pdf-sync-minor-mode pdf-misc-context-menu-minor-mode pdf-cache-prefetch-minor-mode pdf-occur-global-minor-mode pdf-virtual-global-minor-mode)))
@@ -47,12 +52,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(font-lock-type-face ((t (:inherit nil :foreground "#ce537a"))))
  '(linum ((t (:background "#0c0d0e" :foreground "#44505c"))))
  '(mode-line ((t (:background "#222226" :foreground "#b2b2b2" :box (:line-width 1 :color "gray43") :height 0.9))))
  '(mode-line-inactive ((t (:background "#232629" :foreground "dim gray" :box nil))))
+ '(region ((t (:background "green4" :foreground "black"))))
  '(swiper-match-face-2 ((t (:background "tan" :inverse-video t)))))
 
-n
+
 
 ;; set functions
 
@@ -158,10 +165,6 @@ n
       inhibit-startup-message t
       fit-window-to-buffer-horizontally t
       display-time-mode t)
-      
-;; (set-fringe-style '(500 . 500))
-;; (set-fringe-style '(10 . 10))
-
 
 
 ;; HOOKS TERMINAR!!!!
@@ -173,6 +176,7 @@ n
 ;; 	(c++-mode-hook company-mode)
 ;; 	(c++-mode-hook flycheck-mode)))
 
+(add-hook 'dired-mode-hook (lambda ()(dired-omit-mode)))
 (defun my-irony-mode-hook ()
   (define-key irony-mode-map [remap completion-at-point]
     'counsel-irony)
@@ -183,7 +187,15 @@ n
 (add-hook 'c-mode-hook 'irony-mode)
 (add-hook 'objc-mode-hook 'irony-mode)
 (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-(mapc (lambda (hook) (add-hook hook 'linum-mode))
+(mapc (lambda (hook) (add-hook hook 'display-line-numbers-mode))
+      '(c++-mode-hook
+        c-mode-hook
+        objc-mode-hook
+        lisp-mode-hook
+        emacs-lisp-mode-hook
+        python-mode-hook
+        conf-mode-hook))
+(mapc (lambda (hook) (add-hook hook 'rainbow-delimiters-mode))
       '(c++-mode-hook
         c-mode-hook
         objc-mode-hook
@@ -192,7 +204,10 @@ n
         python-mode-hook
         conf-mode-hook))
 (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++1z")))
-
+;; (add-hook 'window-configuration-change-hook (lambda ()
+;; 					      (if (eq (count-windows) 1)
+;; 						  (set-fringe-style 500)
+;; 						(set-fringe-style nil))))
 
 
 
@@ -222,6 +237,8 @@ n
 	 :map slime-mode-map
 	 ("<f1>" . slime-documentation-lookup)
 	 ("M-m" . slime-selector)
+	 ("M-p" . gcm-scroll-up)
+	 ("M-n" . gcm-scroll-down)
 	 :map slime-repl-mode-map
 	 ("<f1>" . slime-documentation-lookup)
 	 ("M-m" . slime-selector))
@@ -229,8 +246,13 @@ n
   (load (expand-file-name "~/.roswell/helper.el"))
   (setq slime-contribs '(slime-fancy)
 	inferior-lisp-program "ros -Q run")
+  ;; (setf slime-lisp-implementations
+  ;; 	`((sbcl ("sbcl"))
+  ;; 	  (ecl ("ecl"))))
+  ;; (setf slime-default-lisp 'roswell)
   :config
   (slime))
+
 
 ;; ============ ;;   swiper   ;; ============ ;;
 
@@ -262,6 +284,14 @@ n
   :config
   (which-key-mode 1))
 
+;; ============ ;;   projectile   ;; ============ ;;
+
+(use-package projectile
+  :ensure t
+  :init
+  (setq projectile-switch-project-action #'projectile-dired)
+  :config
+  (projectile-global-mode t))
 
 ;; ============ ;;   company   ;; ============ ;;
 
@@ -273,18 +303,28 @@ n
 	      ("\C-n" . company-select-next-or-abort)
 	      ("\C-p" . company-select-previous-or-abort)
 	      ("<tab>" . company-show-doc-buffer))
+  :init
+  (setq company-show-numbers t)
+  (setq company-idle-delay 0)
   :config
-  (global-company-mode 1))
+  (global-company-mode 1)
+  (add-to-list 'company-backends
+	       '(company-irony-c-headers
+		 company-irony)))
+  ;;problema de ordem de carregamento? da certo ser re eval esse codigo após abrir .cpp
 
 
 ;; ============ ;;   dired   ;; ============ ;;
 
 
-(use-package dired
-  :bind (:map dired-mode-map
-	      ("M-p" . gcm-scroll-up)
-	      ("M-d" . gcm-scroll-down)
-	      ))
+;; (use-package dired
+;;   :bind (:map dired-mode-map
+;; 	      ("M-p" . gcm-scroll-up)
+;; 	      ("M-d" . gcm-scroll-down))
+;;   :config
+;;   (add-hook dired-mode-hook (lambda ()(dired-omit-mode))))
+  
+  
 
 ;; ============ ;;   image-dired   ;; ============ ;;
 
@@ -318,7 +358,10 @@ n
 (use-package org
   :ensure t
   :bind (("C-c c" . org-capture)
-	 ("C-c a" . org-agenda))
+	 ("C-c a" . org-agenda)
+	 :map org-mode-map
+	      ("M-n" . gcm-scroll-down)
+	      ("M-p" . gcm-scroll-up))
   :init
   (setq org-todo-keywords '((sequence "TODO" "MOSTLY DONE" "DONE"))
 	org-agenda-files (list "~/Dropbox/todo.org" "~/Dropbox/todos/Faculdade.org" "~/Dropbox/todos/projs.org" "~/Dropbox/todos/misc.org")
@@ -336,11 +379,13 @@ n
 	 ("M-y" . helm-show-kill-ring)
 	 ("M-x" . helm-M-x)
 	 ("M-h" . helm-apropos)
+	 ("C-s" . helm-swoop)
 	 :map helm-map
  	 ("<tab>" . helm-execute-persistent-action) ; rebind tab to do persistent action
 	 ("C-i" . helm-execute-persistent-action) ; make TAB works in terminal
 	 ("C-z" . helm-select-action) ; list actions using C-z
 	 ("C-l" . backward-delete-char))
+	 
   :init
   (setq helm-display-header-line t ;; t by default
 	helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
@@ -357,9 +402,13 @@ n
 	helm-gtags-use-input-at-cursor t)
   :config
   (helm-mode 1)
-  (set-face-attribute 'helm-source-header t :height 10)
-  (helm-autoresize-mode 1))
+    (helm-autoresize-mode 1))
 
+;; ============ ;;   ido   ;; ============ ;;
+
+(use-package ido
+  :ensure t
+  :bind (("C-o" . ido-switch-buffer)))
 
 ;; ============ ;;   w3m   ;; ============ ;;
 
@@ -395,14 +444,14 @@ n
 ;; ============ ;;   mu4e   ;; ============ ;;
 
 (use-package mu4e
-  :ensure t
+  ;;:ensure t
   :init 
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
   (setq org-mu4e-link-query-in-headers-mode nil
 	mail-user-agent 'mu4e-user-agent
 	;; allow for updating mail using 'U' in the main view:
 	mu4e-get-mail-command "offlineimap"
-	mu4e-update-interval 600
+	mu4e-update-interval 1200
 	;; something about ourselves
 	user-mail-address "philippejara@gmail.com"
 	user-full-name  "Philippe Jara de Mello Mesquita Martins"
@@ -411,7 +460,7 @@ n
 	mu4e-sent-messages-behavior 'delete
 	;; don't keep message buffers around
 	message-kill-buffer-on-exit t
-	mu4e-maildir-shortcuts ()))
+	mu4e-maildir-shortcuts ())) 
 
 
 ;; ============ ;;   golden-ratio   ;; ============ ;;
@@ -424,7 +473,7 @@ n
 	(symbol-value 'helm-alive-p)))
   :config
   (add-to-list 'golden-ratio-inhibit-functions 'pl/helm-alive-p)
-  (golden-ratio-mode t))
+  (golden-ratio-mode nil))
 
 
 ;; ============ ;;   anzu   ;; ============ ;;
@@ -441,7 +490,32 @@ n
                                 :query nil)
     (goto-char (marker-position orig))
     (set-marker orig nil)))
-)
-;; ============ ;;   theme   ;; ============ ;;
+  )
+;; ============ ;;   magit   ;; ============ ;;
 
+(use-package magit
+  :ensure t
+  :bind ("<f7>" . magit-status))
+
+;; ============ ;;   undo-tree   ;; ============ ;;
+
+(use-package undo-tree
+  :ensure t
+  :bind(("C-z" . undo-tree-undo)
+	("C-Z" . undo-tree-redo))
+  :config
+  (global-undo-tree-mode))
+
+;; ;; ============ ;;   centered-window-mode   ;; ============ ;;
+
+;; (use-package centered-window-mode
+;;   :ensure t
+;;   :config
+;;   (centered-window-mode))
+
+
+;; ============ ;;   theme   ;; ============ ;;
+(add-to-list 'default-frame-alist '(background-color . "black"))
 (load-theme 'spacemacs-dark)
+
+
