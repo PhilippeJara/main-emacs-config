@@ -300,6 +300,7 @@
   :ensure t
   :bind (:map company-active-map
 	      ("spc" . company-abort)
+	      ("s" . self-insert-command)
 	      ("\C-n" . company-select-next-or-abort)
 	      ("\C-p" . company-select-previous-or-abort)
 	      ("<tab>" . company-show-doc-buffer))
