@@ -5,8 +5,7 @@
 
 
 
-(add-to-list 'package-archives
-             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 (package-initialize)
 
 (custom-set-variables
@@ -40,7 +39,7 @@
  '(org-mobile-inbox-for-pull "~/Dropbox/org/from-mobile.org")
  '(package-selected-packages
    (quote
-    (helm-directory el-get swiper-helm rainbow-delimiters cpputils-cmake cmake-project htmlize modern-cpp-font-lock cmake-mode cmake-ide json-mode centered-window-mode conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
+    (dired+ helm-directory el-get swiper-helm rainbow-delimiters cpputils-cmake cmake-project htmlize modern-cpp-font-lock cmake-mode cmake-ide json-mode centered-window-mode conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
  '(pdf-tools-enabled-modes
    (quote
     (pdf-history-minor-mode pdf-isearch-minor-mode pdf-links-minor-mode pdf-misc-minor-mode pdf-outline-minor-mode pdf-misc-size-indication-minor-mode pdf-misc-menu-bar-minor-mode pdf-annot-minor-mode pdf-sync-minor-mode pdf-misc-context-menu-minor-mode pdf-cache-prefetch-minor-mode pdf-occur-global-minor-mode pdf-virtual-global-minor-mode)))
@@ -272,7 +271,8 @@
   :init
   (add-hook 'after-init-hook #'global-flycheck-mode)
   :config
-  (global-flycheck-mode t))
+  (global-flycheck-mode t)
+  (flycheck-pos-tip-mode))
 
 
 
@@ -349,7 +349,7 @@
   ;; 	  (setq current-prefix-arg '(5))
   ;; 	  (call-interactively 'image-dired-dired-toggle-marked-thumbs)))
   :config
-  (diredp-all-files)
+  (call-interactively 'diredp-next-line)
   )
 
 
@@ -509,14 +509,22 @@
 
 ;; ;; ============ ;;   centered-window-mode   ;; ============ ;;
 
-;; (use-package centered-window-mode
-;;   :ensure t
-;;   :config
-;;   (centered-window-mode))
+(use-package centered-window-mode
+  :ensure t
+  :config
+  (centered-window-mode))
 
+;; ============ ;;   semantic   ;; ============ ;;
+
+(use-package semantic
+  :ensure t
+  :config
+  (semantic-mode t)
+  (global-semanticdb-minor-mode t)
+  (global-semantic-idle-summary-mode t))
 
 ;; ============ ;;   theme   ;; ============ ;;
 (add-to-list 'default-frame-alist '(background-color . "black"))
 (load-theme 'spacemacs-dark)
-
+(set-default-font "DejaVu Sans Mono 9")
 
