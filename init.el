@@ -209,14 +209,7 @@
         emacs-lisp-mode-hook
         python-mode-hook
         conf-mode-hook))
-(mapc (lambda (hook) (add-hook hook 'flycheck-mode))
-      '(c++-mode-hook
-        c-mode-hook
-        objc-mode-hook
-        lisp-mode-hook
-        emacs-lisp-mode-hook
-        python-mode-hook
-        conf-mode-hook))
+
 (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++1z")))
 (add-hook 'c++-mode-hook 'semantic-mode)
 ;; (add-hook 'window-configuration-change-hook (lambda ()
@@ -313,7 +306,13 @@
   ;;(add-hook 'after-init-hook #'global-flycheck-mode)
   :config
   (flycheck-pos-tip-mode)
-  )
+  (mapc (lambda (hook) (add-hook hook 'flycheck-mode))
+      '(c++-mode-hook
+        c-mode-hook
+        objc-mode-hook
+        lisp-mode-hook
+        python-mode-hook
+        conf-mode-hook)))
 
 
 
@@ -505,16 +504,16 @@
 	;; don't save message to Sent Messages, Gmail/IMAP takes care of this
 	mu4e-sent-messages-behavior 'delete
 	;; don't keep message buffers around
-	message-kill-buffer-on-exit t
-	mu4e-drafts-folder "/[Gmail].Drafts"
-	mu4e-sent-folder   "/[Gmail].Sent Mail"
-	mu4e-trash-folder  "/[Gmail].Trash")
-        mu4e-maildir-shortcuts
-	'( ("/INBOX"               . ?i)
-	   ("/[Gmail].Sent Mail"   . ?s)
-	   ("/[Gmail].Trash"       . ?t)
-	   ("/[Gmail].All Mail"    . ?a)))
-
+	message-kill-buffer-on-exit t)
+  (add-to-list 'mu4e-bookmarks
+       (make-mu4e-bookmark
+        :name "All Inboxes"
+        :query (concat
+		"(maildir:/globomail/INBOX"
+		"OR maildir:/Gmail/INBOX"
+		"OR maildir:/hotmail/INBOX)"
+		"AND NOT flag:list")
+	:key ?i)))
 ;; ============ ;;   golden-ratio   ;; ============ ;;
 
 ;; (use-package golden-ratio
