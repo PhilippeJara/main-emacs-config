@@ -16,9 +16,12 @@
  '(ansi-color-names-vector
    ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
  '(company-echo-truncate-lines nil)
- '(company-tooltip-idle-delay 0.5)
+ '(company-irony-ignore-case (quote smart))
+ '(company-tooltip-align-annotations t)
+ '(company-tooltip-idle-delay 0)
  '(company-tooltip-margin 2)
- '(cua-mode t nil (cua-base))
+ '(company-tooltip-maximum-width 50)
+ '(cua-mode nil nil (cua-base))
  '(cua-normal-cursor-color "black")
  '(custom-enabled-themes nil)
  '(custom-safe-themes
@@ -39,19 +42,21 @@
  '(org-mobile-inbox-for-pull "~/Dropbox/org/from-mobile.org")
  '(package-selected-packages
    (quote
-    (dired+ helm-directory el-get swiper-helm rainbow-delimiters cpputils-cmake cmake-project htmlize modern-cpp-font-lock cmake-mode cmake-ide json-mode centered-window-mode conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
+    (srefactor dired-x direx helm-descbinds latex-preview-pane auctex helm-smex smex helm-fuzzier helm-flx dired+ helm-directory el-get swiper-helm rainbow-delimiters cpputils-cmake cmake-project htmlize modern-cpp-font-lock cmake-mode cmake-ide json-mode centered-window-mode conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
  '(pdf-tools-enabled-modes
    (quote
     (pdf-history-minor-mode pdf-isearch-minor-mode pdf-links-minor-mode pdf-misc-minor-mode pdf-outline-minor-mode pdf-misc-size-indication-minor-mode pdf-misc-menu-bar-minor-mode pdf-annot-minor-mode pdf-sync-minor-mode pdf-misc-context-menu-minor-mode pdf-cache-prefetch-minor-mode pdf-occur-global-minor-mode pdf-virtual-global-minor-mode)))
  '(scroll-bar-mode nil)
  '(show-paren-mode t)
- '(tool-bar-mode nil))
+ '(tool-bar-mode nil)
+ '(tramp-syntax (quote default) nil (tramp)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(font-lock-type-face ((t (:inherit nil :foreground "#ce537a"))))
+ '(fringe ((t (:background "unspecified-bg"))))
  '(linum ((t (:background "#0c0d0e" :foreground "#44505c"))))
  '(mode-line ((t (:background "#222226" :foreground "#b2b2b2" :box (:line-width 1 :color "gray43") :height 0.9))))
  '(mode-line-inactive ((t (:background "#232629" :foreground "dim gray" :box nil))))
@@ -139,6 +144,8 @@
 (global-set-key (kbd "M-n") 'gcm-scroll-down)
 (global-set-key  [f9] 'gud-step)
 (global-set-key  [f6] 'gud-next)
+(global-set-key (kbd "C-s") 'isearch-forward-regexp)
+(global-set-key (kbd "C-r") 'isearch-backward-regexp)
 ;;(global-set-key  (kbd "C-x C-x") 'exchange-mark-no-deac)
 (global-set-key  (kbd "C-x C-x") 'exchange-point-and-mark)
 (global-set-key (kbd "M-r") 'anzu-replace-modificado)
@@ -162,7 +169,7 @@
       visible-bell nil
       global-auto-revert-mode t
       inhibit-startup-message t
-      fit-window-to-buffer-horizontally t
+      ;;fit-window-to-buffer-horizontally t
       display-time-mode t)
 
 
@@ -176,11 +183,11 @@
 ;; 	(c++-mode-hook flycheck-mode)))
 
 (add-hook 'dired-mode-hook (lambda ()(dired-omit-mode)))
-(defun my-irony-mode-hook ()
-  (define-key irony-mode-map [remap completion-at-point]
-    'counsel-irony)
-  (define-key irony-mode-map [remap complete-symbol]
-    'cousel-irony))
+;; (defun my-irony-mode-hook ()
+;;   (define-key irony-mode-map [remap completion-at-point]
+;;     'counsel-irony)
+;;   (define-key irony-mode-map [remap complete-symbol]
+;;     'cousel-irony))
 (add-hook 'irony-mode-hook 'my-irony-mode-hook)
 (add-hook 'c++-mode-hook 'irony-mode)
 (add-hook 'c-mode-hook 'irony-mode)
@@ -202,7 +209,16 @@
         emacs-lisp-mode-hook
         python-mode-hook
         conf-mode-hook))
+(mapc (lambda (hook) (add-hook hook 'flycheck-mode))
+      '(c++-mode-hook
+        c-mode-hook
+        objc-mode-hook
+        lisp-mode-hook
+        emacs-lisp-mode-hook
+        python-mode-hook
+        conf-mode-hook))
 (add-hook 'c++-mode-hook (lambda () (setq flycheck-clang-language-standard "c++1z")))
+(add-hook 'c++-mode-hook 'semantic-mode)
 ;; (add-hook 'window-configuration-change-hook (lambda ()
 ;; 					      (if (eq (count-windows) 1)
 ;; 						  (set-fringe-style 500)
@@ -248,31 +264,56 @@
   ;; (setf slime-lisp-implementations
   ;; 	`((sbcl ("sbcl"))
   ;; 	  (ecl ("ecl"))))
-  ;; (setf slime-default-lisp 'roswell)
+  ;; (setf slime-default-lisp 'usar M-roswell)
   :config
   (slime))
 
 
 ;; ============ ;;   swiper   ;; ============ ;;
 
-(use-package swiper
-  :ensure t
-  :bind (("C-s" . swiper)
-	 :map swiper-map
-	 ("C-s" . ivy-next-line)
-	 ("C-r" . ivy-previous-line)
-	 ("C-l" . backward-delete-char)))
+;; (use-package swiper
+;;   :ensure t
+;;   :bind (("C-s" . swiper)
+;; 	 :map swiper-map
+;; 	 ("C-s" . ivy-next-line)
+;; 	 ("C-r" . ivy-previous-line)
+;; 	 ("C-l" . backward-delete-char)))
 
+;; ============ ;;   irony-mode   ;; ============ ;;
+
+(use-package irony
+  :ensure t
+  :config
+  (use-package company-irony
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-irony))
+  (use-package company-irony-c-headers
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-irony-c-headers))
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'objc-mode-hook 'irony-mode)
+  ;; replace the `completion-at-point' and `complete-symbol' bindings in
+  ;; irony-mode's buffers by irony-mode's function
+  (defun my-irony-mode-hook ()
+    (define-key irony-mode-map [remap completion-at-point]
+      'irony-completion-at-point-async)
+    (define-key irony-mode-map [remap complete-symbol]
+      'irony-completion-at-point-async))
+  (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
 
 ;; ============ ;;   flycheck   ;; ============ ;;
 
 (use-package flycheck
   :ensure t
   :init
-  (add-hook 'after-init-hook #'global-flycheck-mode)
+  ;;(add-hook 'after-init-hook #'global-flycheck-mode)
   :config
-  (global-flycheck-mode t)
-  (flycheck-pos-tip-mode))
+  (flycheck-pos-tip-mode)
+  )
 
 
 
@@ -317,8 +358,9 @@
 
 ;; ============ ;;   dired   ;; ============ ;;
 
-
-;; (use-package dired
+(require 'dired-x)
+;; (use-package dired-x
+  
 ;;   :bind (:map dired-mode-map
 ;; 	      ("M-p" . gcm-scroll-up)
 ;; 	      ("M-d" . gcm-scroll-down))
@@ -380,7 +422,7 @@
 	 ("M-y" . helm-show-kill-ring)
 	 ("M-x" . helm-M-x)
 	 ("M-h" . helm-apropos)
-	 ("C-s" . helm-swoop)
+	 ;;("C-s" . helm-swoop)
 	 :map helm-map
  	 ("<tab>" . helm-execute-persistent-action) ; rebind tab to do persistent action
 	 ("C-i" . helm-execute-persistent-action) ; make TAB works in terminal
@@ -403,7 +445,10 @@
 	helm-gtags-use-input-at-cursor t)
   :config
   (helm-mode 1)
-    (helm-autoresize-mode 1))
+  (helm-autoresize-mode 1)
+  (load-file "~/.emacs.d/helm-ido-like.el")
+)
+
 
 ;; ============ ;;   ido   ;; ============ ;;
 
@@ -447,7 +492,7 @@
 (use-package mu4e
   ;;:ensure t
   :init 
-  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
   (setq org-mu4e-link-query-in-headers-mode nil
 	mail-user-agent 'mu4e-user-agent
 	;; allow for updating mail using 'U' in the main view:
@@ -466,15 +511,14 @@
 
 ;; ============ ;;   golden-ratio   ;; ============ ;;
 
-(use-package golden-ratio
-  :ensure t
-  :init
-  (defun pl/helm-alive-p ()
-    (if (boundp 'helm-alive-p)
-	(symbol-value 'helm-alive-p)))
-  :config
-  (add-to-list 'golden-ratio-inhibit-functions 'pl/helm-alive-p)
-  (golden-ratio-mode nil))
+;; (use-package golden-ratio
+;;     :init
+;;   (defun pl/helm-alive-p ()
+;;     (if (boundp 'helm-alive-p)
+;; 	(symbol-value 'helm-alive-p)))
+;;   :config
+;;   (add-to-list 'golden-ratio-inhibit-functions 'pl/helm-alive-p)
+;;   (golden-ratio-mode nil))
 
 
 ;; ============ ;;   anzu   ;; ============ ;;
@@ -502,8 +546,8 @@
 
 (use-package undo-tree
   :ensure t
-  :bind(("C-z" . undo-tree-undo)
-	("C-Z" . undo-tree-redo))
+  :bind(("C-z" . undo-tree-undo))
+	;;("C-" . undo-tree-redo))
   :config
   (global-undo-tree-mode))
 
@@ -519,12 +563,15 @@
 (use-package semantic
   :ensure t
   :config
-  (semantic-mode t)
   (global-semanticdb-minor-mode t)
-  (global-semantic-idle-summary-mode t))
+  (global-semantic-idle-summary-mode nil))
+;; ============ ;;   pdftools   ;; ============ ;;
+
+(use-package pdftools
+  :init (pdf-tools-install))
 
 ;; ============ ;;   theme   ;; ============ ;;
 (add-to-list 'default-frame-alist '(background-color . "black"))
 (load-theme 'spacemacs-dark)
 (set-default-font "DejaVu Sans Mono 9")
-
+;;(setq redisplay-dont-pause t)
