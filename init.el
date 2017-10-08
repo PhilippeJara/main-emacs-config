@@ -126,7 +126,7 @@
 
 
 ;; set keybinds
- 
+
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-x k") 'kill-this-buffer)
 ;; (global-set-key (kbd "<f2>") 'common-lisp-hyperspec-lookup-reader-macro)
@@ -353,21 +353,21 @@
   (add-to-list 'company-backends
 	       '(company-irony-c-headers
 		 company-irony)))
-  ;;problema de ordem de carregamento? da certo ser re eval esse codigo após abrir .cpp
+;;problema de ordem de carregamento? da certo ser re eval esse codigo após abrir .cpp
 
 
 ;; ============ ;;   dired   ;; ============ ;;
 
 (require 'dired-x)
 ;; (use-package dired-x
-  
+
 ;;   :bind (:map dired-mode-map
 ;; 	      ("M-p" . gcm-scroll-up)
 ;; 	      ("M-d" . gcm-scroll-down))
 ;;   :config
 ;;   (add-hook dired-mode-hook (lambda ()(dired-omit-mode))))
-  
-  
+
+
 
 ;; ============ ;;   image-dired   ;; ============ ;;
 
@@ -403,8 +403,8 @@
   :bind (("C-c c" . org-capture)
 	 ("C-c a" . org-agenda)
 	 :map org-mode-map
-	      ("M-n" . gcm-scroll-down)
-	      ("M-p" . gcm-scroll-up))
+	 ("M-n" . gcm-scroll-down)
+	 ("M-p" . gcm-scroll-up))
   :init
   (setq org-todo-keywords '((sequence "TODO" "MOSTLY DONE" "DONE"))
 	org-agenda-files (list "~/Dropbox/todo.org" "~/Dropbox/todos/Faculdade.org" "~/Dropbox/todos/projs.org" "~/Dropbox/todos/misc.org")
@@ -428,7 +428,7 @@
 	 ("C-i" . helm-execute-persistent-action) ; make TAB works in terminal
 	 ("C-z" . helm-select-action) ; list actions using C-z
 	 ("C-l" . backward-delete-char))
-	 
+  
   :init
   (setq helm-display-header-line t ;; t by default
 	helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
@@ -447,7 +447,7 @@
   (helm-mode 1)
   (helm-autoresize-mode 1)
   (load-file "~/.emacs.d/helm-ido-like.el")
-)
+  )
 
 
 ;; ============ ;;   ido   ;; ============ ;;
@@ -506,8 +506,14 @@
 	mu4e-sent-messages-behavior 'delete
 	;; don't keep message buffers around
 	message-kill-buffer-on-exit t
-	mu4e-maildir-shortcuts ())) 
-
+	mu4e-drafts-folder "/[Gmail].Drafts"
+	mu4e-sent-folder   "/[Gmail].Sent Mail"
+	mu4e-trash-folder  "/[Gmail].Trash")
+        mu4e-maildir-shortcuts
+	'( ("/INBOX"               . ?i)
+	   ("/[Gmail].Sent Mail"   . ?s)
+	   ("/[Gmail].Trash"       . ?t)
+	   ("/[Gmail].All Mail"    . ?a)))
 
 ;; ============ ;;   golden-ratio   ;; ============ ;;
 
@@ -527,14 +533,14 @@
   :ensure t
   :config
   (defun anzu-replace-modificado ()
-  "anzu-query-replace-at-cursor-thing without query."
-  (interactive)
-  (let ((orig (point-marker)))
-    (anzu--query-replace-common t
-                                :at-cursor t
-                                :query nil)
-    (goto-char (marker-position orig))
-    (set-marker orig nil)))
+    "anzu-query-replace-at-cursor-thing without query."
+    (interactive)
+    (let ((orig (point-marker)))
+      (anzu--query-replace-common t
+                                  :at-cursor t
+                                  :query nil)
+      (goto-char (marker-position orig))
+      (set-marker orig nil)))
   )
 ;; ============ ;;   magit   ;; ============ ;;
 
@@ -547,7 +553,7 @@
 (use-package undo-tree
   :ensure t
   :bind(("C-z" . undo-tree-undo))
-	;;("C-" . undo-tree-redo))
+  ;;("C-" . undo-tree-redo))
   :config
   (global-undo-tree-mode))
 
