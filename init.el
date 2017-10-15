@@ -32,6 +32,17 @@
     ("/home/philippe/teste" "/home/philippe/Dropbox/Prog/lisp/org-parser" "c:/Users/Philippe/Dropbox/puc/prog2")))
  '(el-get-dir "~/.emacs.d/elpa/el-get-5.1/")
  '(electric-pair-mode t)
+ '(emms-player-mocp
+   (quote
+    (*player*
+     (start . emms-player-mocp-start)
+     (stop . emms-player-mocp-stop)
+     (playablep . emms-player-mocp-playable-p)
+     (regex . ".+.mp3$")
+     (pause . emms-player-simple-pause)
+     (resume . emms-player-simple-resume))))
+ '(emms-player-mocp-command-name "mocp")
+ '(emms-player-mocp-parameters (quote ("-l")))
  '(global-hl-line-mode t)
  '(global-prettify-symbols-mode t)
  '(ido-mode t nil (ido))
@@ -42,7 +53,7 @@
  '(org-mobile-inbox-for-pull "~/Dropbox/org/from-mobile.org")
  '(package-selected-packages
    (quote
-    (srefactor dired-x direx helm-descbinds latex-preview-pane auctex helm-smex smex helm-fuzzier helm-flx dired+ helm-directory el-get swiper-helm rainbow-delimiters cpputils-cmake cmake-project htmlize modern-cpp-font-lock cmake-mode cmake-ide json-mode centered-window-mode conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
+    (emms srefactor dired-x direx helm-descbinds latex-preview-pane auctex helm-smex smex helm-fuzzier helm-flx dired+ helm-directory el-get swiper-helm rainbow-delimiters cpputils-cmake cmake-project htmlize modern-cpp-font-lock cmake-mode cmake-ide json-mode centered-window-mode conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
  '(pdf-tools-enabled-modes
    (quote
     (pdf-history-minor-mode pdf-isearch-minor-mode pdf-links-minor-mode pdf-misc-minor-mode pdf-outline-minor-mode pdf-misc-size-indication-minor-mode pdf-misc-menu-bar-minor-mode pdf-annot-minor-mode pdf-sync-minor-mode pdf-misc-context-menu-minor-mode pdf-cache-prefetch-minor-mode pdf-occur-global-minor-mode pdf-virtual-global-minor-mode)))
@@ -92,19 +103,19 @@
   (interactive)
   (exchange-point-and-mark)
   (deactivate-mark nil))
-(defun prog2 () (interactive)
-       (let ((root (concat "~/Dropbox/puc/prog2/" "aula_"
-                           (number-to-string (second (calendar-current-date)))
-                           "_"
-                           (number-to-string (first (calendar-current-date)))
-                           )))
-         (make-directory root)
-         (mapc (lambda (x) (write-region (cadr x) nil (concat root (car x))))
-               '(("/main.c" "#include \"auxiliar.h\" \n#include \"main.h\" \nint main(){return 0;}")
-                 ("/main.h" "")
-                 ("/auxiliar.c" "#include \"auxiliar.h\"")
-                 ("/auxiliar.h" "")
-                 ("/makefile" "tst: main.c auxiliar.c \n\t gcc -ggdb main.c auxiliar.c")))))
+;; (defun prog2 () (interactive)
+;;        (let ((root (concat "~/Dropbox/puc/prog2/" "aula_"
+;;                            (number-to-string (second (calendar-current-date)))
+;;                            "_"
+;;                            (number-to-string (first (calendar-current-date)))
+;;                            )))
+;;          (make-directory root)
+;;          (mapc (lambda (x) (write-region (cadr x) nil (concat root (car x))))
+;;                '(("/main.c" "#include \"auxiliar.h\" \n#include \"main.h\" \nint main(){return 0;}")
+;;                  ("/main.h" "")
+;;                  ("/auxiliar.c" "#include \"auxiliar.h\"")
+;;                  ("/auxiliar.h" "")
+;;                  ("/makefile" "tst: main.c auxiliar.c \n\t gcc -ggdb main.c auxiliar.c")))))
 
 (defun gcm-scroll-down ()
   (interactive)
@@ -305,14 +316,16 @@
   :init
   ;;(add-hook 'after-init-hook #'global-flycheck-mode)
   :config
-  (flycheck-pos-tip-mode)
+  (setq flycheck-display-errors-delay 1.2)
+  ;;(flycheck-pos-tip-mode)
   (mapc (lambda (hook) (add-hook hook 'flycheck-mode))
       '(c++-mode-hook
         c-mode-hook
         objc-mode-hook
         lisp-mode-hook
         python-mode-hook
-        conf-mode-hook)))
+        conf-mode-hook))
+  )
 
 
 
@@ -504,16 +517,22 @@
 	;; don't save message to Sent Messages, Gmail/IMAP takes care of this
 	mu4e-sent-messages-behavior 'delete
 	;; don't keep message buffers around
-	message-kill-buffer-on-exit t)
-  (add-to-list 'mu4e-bookmarks
+	message-kill-buffer-on-exit t
+	mu4e-drafts-folder "/Gmail/[Gmail].Drafts"
+	mu4e-sent-folder   "/Gmail/[Gmail].Sent Mail"
+	mu4e-trash-folder  "/Gmail/trash"
+        mu4e-maildir-shortcuts
+	'( ("/Gmail/[Gmail].Sent Mail"   . ?s)
+	   ("/Gmail/[Gmail].Trash"       . ?t)
+	   ("/Gmail/[Gmail].All Mail"    . ?a)))
+:config
+(add-to-list 'mu4e-bookmarks
        (make-mu4e-bookmark
         :name "All Inboxes"
         :query (concat
-		"(maildir:/globomail/INBOX"
-		"OR maildir:/Gmail/INBOX"
-		"OR maildir:/hotmail/INBOX)"
+		"(maildir:/globomail/INBOX OR maildir:/Gmail/INBOX OR maildir:/hotmail/INBOX)"
 		"AND NOT flag:list")
-	:key ?i)))
+        :key ?i)))
 ;; ============ ;;   golden-ratio   ;; ============ ;;
 
 ;; (use-package golden-ratio
@@ -574,9 +593,22 @@
 
 (use-package pdftools
   :init (pdf-tools-install))
+;; ============ ;;   emms   ;; ============ ;;
+
+(use-package emms
+  :config
+  (emms-standard)
+  (define-emms-simple-player mocp
+    '(file)
+    "\\.mp3$"
+    "mocp"
+    "-l")
+  ;;(emms-default-players)
+  (add-to-list 'emms-player-list 'emms-player-mocp))
 
 ;; ============ ;;   theme   ;; ============ ;;
 (add-to-list 'default-frame-alist '(background-color . "black"))
 (load-theme 'spacemacs-dark)
 (set-default-font "DejaVu Sans Mono 9")
 ;;(setq redisplay-dont-pause t)
+
