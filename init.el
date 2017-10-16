@@ -26,7 +26,7 @@
  '(custom-enabled-themes nil)
  '(custom-safe-themes
    (quote
-    ("145aa35c243c585f446792f0920b8d7e161ff7b69c8f683095c4090c83c4809f" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "596a1db81357b93bd1ae17bed428d0021d12f30cda7bbb31ac44e115039171ae" "baed613982750c890ae1e6d704eacfe61b227b5bc21f5090b47792cef1892c5a" "6652533b56a94b84c281b6e3c7c16890b0b43cc85d1fe1b16201798a846e3d0b" default)))
+    ("6333b02622c185a36c4b4b2dcd706fc3d153d8f11bb68ea95d59f265d026bcce" "145aa35c243c585f446792f0920b8d7e161ff7b69c8f683095c4090c83c4809f" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "596a1db81357b93bd1ae17bed428d0021d12f30cda7bbb31ac44e115039171ae" "baed613982750c890ae1e6d704eacfe61b227b5bc21f5090b47792cef1892c5a" "6652533b56a94b84c281b6e3c7c16890b0b43cc85d1fe1b16201798a846e3d0b" default)))
  '(ede-project-directories
    (quote
     ("/home/philippe/teste" "/home/philippe/Dropbox/Prog/lisp/org-parser" "c:/Users/Philippe/Dropbox/puc/prog2")))
@@ -38,7 +38,7 @@
      (start . emms-player-mocp-start)
      (stop . emms-player-mocp-stop)
      (playablep . emms-player-mocp-playable-p)
-     (regex . ".+.mp3$")
+     (regex . "\\.mp3$")
      (pause . emms-player-simple-pause)
      (resume . emms-player-simple-resume))))
  '(emms-player-mocp-command-name "mocp")
@@ -270,7 +270,8 @@
   ;; 	  (ecl ("ecl"))))
   ;; (setf slime-default-lisp 'usar M-roswell)
   :config
-  (slime))
+  ;;(slime)
+  )
 
 
 ;; ============ ;;   swiper   ;; ============ ;;
@@ -372,10 +373,9 @@
 
 (require 'dired-x)
 ;; (use-package dired-x
-
 ;;   :bind (:map dired-mode-map
 ;; 	      ("M-p" . gcm-scroll-up)
-;; 	      ("M-d" . gcm-scroll-down))
+;; 	      ("M-d" . gcm-scroll-down)))
 ;;   :config
 ;;   (add-hook dired-mode-hook (lambda ()(dired-omit-mode))))
 
@@ -383,13 +383,13 @@
 
 ;; ============ ;;   image-dired   ;; ============ ;;
 
-(use-package image-dired)
-:ensure t
+(use-package image-dired
+:ensure t)
 
 ;; ============ ;;   image-dired+   ;; ============ ;;
 
-(use-package image-dired+)
-:ensure t
+(use-package image-dired+
+:ensure t)
 ;; ============ ;;   dired+   ;; ============ ;;
 
 (use-package dired+
@@ -509,7 +509,7 @@
 	mail-user-agent 'mu4e-user-agent
 	;; allow for updating mail using 'U' in the main view:
 	mu4e-get-mail-command "offlineimap"
-	mu4e-update-interval 1200
+	mu4e-update-interval 2400
 	;; something about ourselves
 	user-mail-address "philippejara@gmail.com"
 	user-full-name  "Philippe Jara de Mello Mesquita Martins"
@@ -607,8 +607,10 @@
   (add-to-list 'emms-player-list 'emms-player-mocp))
 
 ;; ============ ;;   theme   ;; ============ ;;
-(add-to-list 'default-frame-alist '(background-color . "black"))
-(load-theme 'spacemacs-dark)
+;;(add-to-list 'default-frame-alist '(background-color . "black"))
+;;(load-theme 'spacemacs-dark)
+;;(load-theme 'personal-dark-2edgy4u t)
+(load-theme 'leuven t)
 (set-default-font "DejaVu Sans Mono 9")
-;;(setq redisplay-dont-pause t)
+(setq redisplay-dont-pause t)
 
