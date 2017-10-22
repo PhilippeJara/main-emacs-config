@@ -344,6 +344,9 @@
   :ensure t
   :init
   (setq projectile-switch-project-action #'projectile-dired)
+  (setq projectile-mode-line
+         '(:eval (format " Projectile[%s]"
+                         (projectile-project-name)))
   :config
   (projectile-global-mode t))
 
