@@ -616,6 +616,6 @@
 (load-theme 'my-light-theme t)
 ;;r(set-default-font "DejaVu Sans Mono 9")
 (setq redisplay-dont-pause t)
-
+(require 'dired+)
 
 
