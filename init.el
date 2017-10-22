@@ -610,7 +610,7 @@
 ;;(add-to-list 'default-frame-alist '(background-color . "black"))
 ;;(load-theme 'spacemacs-dark)
 ;;(load-theme 'personal-dark-2edgy4u t)
-(load-theme 'leuven t)
-(set-default-font "DejaVu Sans Mono 9")
+(load-theme 'my-light-theme t)
+;;r(set-default-font "DejaVu Sans Mono 9")
 (setq redisplay-dont-pause t)
 
