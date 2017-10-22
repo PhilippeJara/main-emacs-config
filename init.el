@@ -67,7 +67,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(font-lock-type-face ((t (:inherit nil :foreground "#ce537a"))))
- '(fringe ((t (:background "unspecified-bg"))))
+ ;;'(fringe ((t (:background "unspecified-bg"))))
  '(linum ((t (:background "#0c0d0e" :foreground "#44505c"))))
  '(mode-line ((t (:background "#222226" :foreground "#b2b2b2" :box (:line-width 1 :color "gray43") :height 0.9))))
  '(mode-line-inactive ((t (:background "#232629" :foreground "dim gray" :box nil))))
@@ -176,7 +176,7 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq ido-enable-flex-matching t
-      ido-everywhere t
+      ido-everywhere nil
       visible-bell nil
       global-auto-revert-mode t
       inhibit-startup-message t
@@ -348,7 +348,7 @@
          '(:eval (format " Projectile[%s]"
                          (projectile-project-name)))
   :config
-  (projectile-global-mode t))
+  (projectile-global-mode t)))
 
 ;; ============ ;;   company   ;; ============ ;;
 
@@ -616,4 +616,6 @@
 (load-theme 'my-light-theme t)
 ;;r(set-default-font "DejaVu Sans Mono 9")
 (setq redisplay-dont-pause t)
+
+
 
