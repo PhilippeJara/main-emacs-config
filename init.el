@@ -103,19 +103,7 @@
   (interactive)
   (exchange-point-and-mark)
   (deactivate-mark nil))
-;; (defun prog2 () (interactive)
-;;        (let ((root (concat "~/Dropbox/puc/prog2/" "aula_"
-;;                            (number-to-string (second (calendar-current-date)))
-;;                            "_"
-;;                            (number-to-string (first (calendar-current-date)))
-;;                            )))
-;;          (make-directory root)
-;;          (mapc (lambda (x) (write-region (cadr x) nil (concat root (car x))))
-;;                '(("/main.c" "#include \"auxiliar.h\" \n#include \"main.h\" \nint main(){return 0;}")
-;;                  ("/main.h" "")
-;;                  ("/auxiliar.c" "#include \"auxiliar.h\"")
-;;                  ("/auxiliar.h" "")
-;;                  ("/makefile" "tst: main.c auxiliar.c \n\t gcc -ggdb main.c auxiliar.c")))))
+
 
 (defun gcm-scroll-down ()
   (interactive)
@@ -138,12 +126,25 @@
 
 ;; set keybinds
 
+
 (global-set-key (kbd "C-x C-b") 'ibuffer)
-(global-set-key (kbd "C-x k") 'kill-this-buffer)
+(global-set-key (kbd "C-x k") '(lambda ()(interactive)
+				 (cond ((> (count-windows) 1)
+					(kill-buffer-and-window))
+				       (t
+					(kill-buffer (buffer-name)))
+				       )))
 ;; (global-set-key (kbd "<f2>") 'common-lisp-hyperspec-lookup-reader-macro)
 ;; (global-set-key (kbd "<f3>") 'common-lisp-hyperspec-format)
 (global-set-key (kbd "<apps>") 'execute-extended-command)
 (global-set-key (kbd "C-l") 'backward-delete-char)
+(global-set-key (kbd "C-x 3") '(lambda ()(interactive)
+			       (cond ((bound-and-true-p centered-window-mode)
+						       (centered-window-mode-toggle)
+						       (split-window-right)
+						       (centered-window-mode-toggle))
+				     (t
+				      (split-window-right)))))
 (global-set-key (kbd "C-a") 'back-to-indentation)
 (global-set-key (kbd "M-;") 'comment-dwim)
 (global-set-key (kbd "M-o") 'other-window)
