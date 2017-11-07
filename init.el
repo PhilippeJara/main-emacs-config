@@ -26,7 +26,7 @@
  '(custom-enabled-themes nil)
  '(custom-safe-themes
    (quote
-    ("6333b02622c185a36c4b4b2dcd706fc3d153d8f11bb68ea95d59f265d026bcce" "145aa35c243c585f446792f0920b8d7e161ff7b69c8f683095c4090c83c4809f" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "596a1db81357b93bd1ae17bed428d0021d12f30cda7bbb31ac44e115039171ae" "baed613982750c890ae1e6d704eacfe61b227b5bc21f5090b47792cef1892c5a" "6652533b56a94b84c281b6e3c7c16890b0b43cc85d1fe1b16201798a846e3d0b" default)))
+    ("995ac09bfad567639d96ab85be88543e5d608ccfbfbc022df533166333991c43" "6333b02622c185a36c4b4b2dcd706fc3d153d8f11bb68ea95d59f265d026bcce" "145aa35c243c585f446792f0920b8d7e161ff7b69c8f683095c4090c83c4809f" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "596a1db81357b93bd1ae17bed428d0021d12f30cda7bbb31ac44e115039171ae" "baed613982750c890ae1e6d704eacfe61b227b5bc21f5090b47792cef1892c5a" "6652533b56a94b84c281b6e3c7c16890b0b43cc85d1fe1b16201798a846e3d0b" default)))
  '(ede-project-directories
    (quote
     ("/home/philippe/teste" "/home/philippe/Dropbox/Prog/lisp/org-parser" "c:/Users/Philippe/Dropbox/puc/prog2")))
@@ -67,7 +67,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(font-lock-type-face ((t (:inherit nil :foreground "#ce537a"))))
- ;;'(fringe ((t (:background "unspecified-bg"))))
+ '(fringe ((t (:background "#FFFFFF"))))
  '(linum ((t (:background "#0c0d0e" :foreground "#44505c"))))
  '(mode-line ((t (:background "#222226" :foreground "#b2b2b2" :box (:line-width 1 :color "gray43") :height 0.9))))
  '(mode-line-inactive ((t (:background "#232629" :foreground "dim gray" :box nil))))
@@ -244,7 +244,16 @@
 
 
 
+ (defun my-browse (url &rest ignore)
+      "Browse URL using w3m."
+      (interactive "sURL: ")
+      (shell-command (concat "conkeror.sh " url))
+      (pop-to-buffer "*Shell Command Output*")
+      (setq truncate-lines t))
 
+
+(setq browse-url-browser-function 'my-browse)
+      
 
 
 
