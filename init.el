@@ -27,6 +27,7 @@
  '(custom-safe-themes
    (quote
     ("995ac09bfad567639d96ab85be88543e5d608ccfbfbc022df533166333991c43" "6333b02622c185a36c4b4b2dcd706fc3d153d8f11bb68ea95d59f265d026bcce" "145aa35c243c585f446792f0920b8d7e161ff7b69c8f683095c4090c83c4809f" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "596a1db81357b93bd1ae17bed428d0021d12f30cda7bbb31ac44e115039171ae" "baed613982750c890ae1e6d704eacfe61b227b5bc21f5090b47792cef1892c5a" "6652533b56a94b84c281b6e3c7c16890b0b43cc85d1fe1b16201798a846e3d0b" default)))
+ '(dired-listing-switches "-al -h")
  '(ede-project-directories
    (quote
     ("/home/philippe/teste" "/home/philippe/Dropbox/Prog/lisp/org-parser" "c:/Users/Philippe/Dropbox/puc/prog2")))
@@ -43,7 +44,7 @@
      (resume . emms-player-simple-resume))))
  '(emms-player-mocp-command-name "mocp")
  '(emms-player-mocp-parameters (quote ("-l")))
- '(global-hl-line-mode t)
+ '(global-hl-line-mode nil)
  '(global-prettify-symbols-mode t)
  '(ido-mode t nil (ido))
  '(menu-bar-mode nil)
@@ -53,7 +54,7 @@
  '(org-mobile-inbox-for-pull "~/Dropbox/org/from-mobile.org")
  '(package-selected-packages
    (quote
-    (emms srefactor dired-x direx helm-descbinds latex-preview-pane auctex helm-smex smex helm-fuzzier helm-flx dired+ helm-directory el-get swiper-helm rainbow-delimiters cpputils-cmake cmake-project htmlize modern-cpp-font-lock cmake-mode cmake-ide json-mode centered-window-mode conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
+    (dired-subtree files+ cloc emms srefactor dired-x direx helm-descbinds latex-preview-pane auctex helm-smex smex helm-fuzzier helm-flx dired+ helm-directory el-get swiper-helm rainbow-delimiters cpputils-cmake cmake-project htmlize modern-cpp-font-lock cmake-mode cmake-ide json-mode centered-window-mode conkeror-minor-mode image-dired+ w3m zygospore helm-gtags helm yasnippet ws-butler volatile-highlights use-package undo-tree iedit dtrt-indent counsel-projectile company clean-aindent-mode anzu)))
  '(pdf-tools-enabled-modes
    (quote
     (pdf-history-minor-mode pdf-isearch-minor-mode pdf-links-minor-mode pdf-misc-minor-mode pdf-outline-minor-mode pdf-misc-size-indication-minor-mode pdf-misc-menu-bar-minor-mode pdf-annot-minor-mode pdf-sync-minor-mode pdf-misc-context-menu-minor-mode pdf-cache-prefetch-minor-mode pdf-occur-global-minor-mode pdf-virtual-global-minor-mode)))
@@ -181,8 +182,8 @@
       visible-bell nil
       global-auto-revert-mode t
       inhibit-startup-message t
-      ;;fit-window-to-buffer-horizontally t
-      display-time-mode t)
+      display-time-mode t
+      delete-by-moving-to-trash t)
 
 
 ;; HOOKS TERMINAR!!!!
@@ -247,9 +248,8 @@
  (defun my-browse (url &rest ignore)
       "Browse URL using w3m."
       (interactive "sURL: ")
-      (shell-command (concat "conkeror.sh " url))
-      (pop-to-buffer "*Shell Command Output*")
-      (setq truncate-lines t))
+      (shell-command (concat "conkeror.sh " url)))
+      
 
 
 (setq browse-url-browser-function 'my-browse)
@@ -385,6 +385,7 @@
 ;; ============ ;;   dired   ;; ============ ;;
 
 (require 'dired-x)
+(require 'files+)
 ;; (use-package dired-x
 ;;   :bind (:map dired-mode-map
 ;; 	      ("M-p" . gcm-scroll-up)
@@ -407,16 +408,20 @@
 
 (use-package dired+
   :ensure t
-  :bind (:map diredp-list-files-map
+  :bind ((:map diredp-list-files-map
 	      ("M-n" . gcm-scroll-down)
 	      ("M-p" . gcm-scroll-up)
 	      ("C-t c-t" . image-toggle ))
+	 (:map dired-mode-map
+	      ("M-p" . gcm-scroll-up)
+	      ("M-d" . gcm-scroll-down)))
   ;; :init (defun image-toggle ()
   ;; 	  (interactive)
   ;; 	  (setq current-prefix-arg '(5))
   ;; 	  (call-interactively 'image-dired-dired-toggle-marked-thumbs)))
   :config
   (call-interactively 'diredp-next-line)
+  (setq dired-dwim-target t)
   )
 
 
@@ -599,6 +604,8 @@
 
 (use-package semantic
   :ensure t
+  :bind(:map c++-mode-map
+	     ("M-<tab>" . semantic-ia-fast-jump))
   :config
   (global-semanticdb-minor-mode t)
   (global-semantic-idle-summary-mode nil))
@@ -619,11 +626,19 @@
   ;;(emms-default-players)
   (add-to-list 'emms-player-list 'emms-player-mocp))
 
+
+(use-package dired-subtree
+  :ensure t
+  :config
+  (bind-keys :map dired-mode-map
+             ("i" . dired-subtree-insert)
+             (";" . dired-subtree-remove)))
+
 ;; ============ ;;   theme   ;; ============ ;;
 ;;(add-to-list 'default-frame-alist '(background-color . "black"))
 ;;(load-theme 'spacemacs-dark)
-;;(load-theme 'personal-dark-2edgy4u t)
-(load-theme 'my-light-theme t)
+(load-theme 'personal-dark-2edgy4u t)
+;;(load-theme 'my-light-theme t)
 ;;r(set-default-font "DejaVu Sans Mono 9")
 (setq redisplay-dont-pause t)
 (require 'dired+)
